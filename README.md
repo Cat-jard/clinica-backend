@@ -1,13 +1,15 @@
 # Clínica Backend — SIHCE (arquitectura de microservicios)
 
 Backend del Sistema de Historia Clínica Electrónica. Arquitectura **Spring Cloud**.
-Este repositorio implementa, por ahora, **únicamente el `usuario-service`**; el resto
+Este repositorio implementa, por ahora, los servicios marcados como ✅; el resto
 de microservicios se listan abajo como hoja de ruta.
 
 ## ✅ Implementado
 | Servicio | Puerto | Descripción |
 |----------|--------|-------------|
 | **usuario-service** | 8081 | Autenticación (JWT + BCrypt), usuarios, roles, RBAC y registro de pacientes (datos demográficos/administrativos). |
+| **auditoria-service** | 8082 | Bitácora inalterable de eventos del sistema (quién hizo qué, cuándo y desde dónde). Valida el JWT. |
+| **soporte-service** | 8083 | Tickets de incidencias de TI: alta, seguimiento de estado, prioridad y asignación. Valida el JWT. |
 
 > **Decisión de arquitectura:** la autenticación de **todas** las cuentas (incluido el
 > paciente, rol `PACIENTE`) y el **registro de pacientes** viven en `usuario-service`.
@@ -34,8 +36,6 @@ Necesarios para que el ecosistema funcione como microservicios:
 | **hospitalizacion-service** | Administración | Camas, ingresos y ocupación. |
 | **facturacion-service** | Administración | Facturas, finanzas y aseguradoras. |
 | **notificacion-service** | Transversal | Mensajería y notificaciones. |
-| **auditoria-service** | Transversal / TI | Logs y trazabilidad inalterable (Ley 30024). |
-| **soporte-service** | Soporte / TI | Incidencias, backups, monitoreo y BCP. |
 | **reporteria-service** | Administración | Dashboard ejecutivo y reportes. |
 
 > Mínimo para una demo funcional con el frontend actual:
@@ -47,4 +47,7 @@ Necesarios para que el ecosistema funcione como microservicios:
 - Base de datos **PostgreSQL** por servicio (BD por microservicio) con migraciones **Flyway**.
 - Seguridad: el `usuario-service` emite el JWT; los demás lo validan (RBAC por rol).
 
-Ver detalles del servicio implementado en [`usuario-service/README.md`](usuario-service/README.md).
+Ver detalles de cada servicio implementado en su README:
+[`usuario-service`](usuario-service/README.md) ·
+[`auditoria-service`](auditoria-service/README.md) ·
+[`soporte-service`](soporte-service/README.md).
