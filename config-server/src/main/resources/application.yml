@@ -1,0 +1,35 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+
+  profiles:
+    # Perfil 'native': sirve la configuracion desde el sistema de archivos / classpath
+    # en lugar de un repositorio Git. Ideal para desarrollo y demos.
+    active: native
+
+  cloud:
+    config:
+      server:
+        native:
+          # Carpeta con los archivos de configuracion de cada servicio.
+          # Se resuelve relativa al directorio de arranque del proyecto.
+          search-locations: classpath:/config-repo
+
+# ----- Eureka: el config-server se registra para poder descubrirse -----
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
