@@ -2,6 +2,9 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/auditoria-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/citas-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eureka-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/recepcion-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/soporte-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/usuario-service/src/main/java" charset="UTF-8" />
   </component>
