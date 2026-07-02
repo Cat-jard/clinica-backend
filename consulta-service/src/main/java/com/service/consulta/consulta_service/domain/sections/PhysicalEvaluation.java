@@ -1,7 +1,10 @@
-package domain;
+package com.service.consulta.consulta_service.domain.sections;
 
+import com.service.consulta.consulta_service.domain.Consultation;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.UUID;
 
 @Entity
 @Table(name = "physica_evaluation")
@@ -12,7 +15,7 @@ import lombok.*;
 @Builder
 public class PhysicalEvaluation {
     @Id
-    private Long consultationId;
+    private UUID consultationId;
 
     @OneToOne
     @MapsId

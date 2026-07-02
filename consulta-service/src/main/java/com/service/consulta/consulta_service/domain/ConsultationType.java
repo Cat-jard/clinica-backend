@@ -1,4 +1,4 @@
-package domain;
+package com.service.consulta.consulta_service.domain;
 
 public enum ConsultationType {
     CONSULTA_INICIAL,

@@ -7,6 +7,7 @@ import org.hibernate.type.SqlTypes;
 import tools.jackson.databind.JsonNode;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -17,20 +18,20 @@ import java.time.LocalDateTime;
 @Table(name = "medical_history_event")
 public class HistoryEvent {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     //Reference to the id of another microservice, this id is used by the frontend to
     // then call said microservices when more details want to be shown
     // since not all personal data is handled by this service
-    private Long patientId;
+    private UUID patientId;
 
     @Enumerated(EnumType.STRING)
     private EventType eventType;
 
     private LocalDateTime ocurredAt;
     private String sourceService;
-    private Long referenceId;
+    private UUID referenceId;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")

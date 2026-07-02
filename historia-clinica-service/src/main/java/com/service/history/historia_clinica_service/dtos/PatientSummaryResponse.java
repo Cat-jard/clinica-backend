@@ -5,9 +5,10 @@ import com.service.history.historia_clinica_service.domain.SexType;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public record PatientSummaryResponse(
-        Long patientId,
+        UUID patientId,
         String fullname,
         String dni,
         Short age,

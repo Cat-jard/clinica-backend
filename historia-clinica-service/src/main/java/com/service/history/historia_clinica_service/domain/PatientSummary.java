@@ -8,6 +8,7 @@ import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Setter
@@ -18,9 +19,9 @@ import java.util.List;
 @Table(name = "patient_summary")
 public class PatientSummary {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "patient_id")
-    private Long patientId;
+    private UUID patientId;
 
     @Column(nullable = false, length = 200)
     private String fullname;

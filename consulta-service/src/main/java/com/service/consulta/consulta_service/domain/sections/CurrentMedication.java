@@ -1,10 +1,13 @@
-package domain;
+package com.service.consulta.consulta_service.domain.sections;
 
+import com.service.consulta.consulta_service.domain.Consultation;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.UUID;
 
 @Entity
 @Table(name = "current_medication")
@@ -14,10 +17,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CurrentMedication {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    private Long medicineId;
+    private UUID medicineId;
     private String dose;
     private String frequency;
     @ManyToOne(fetch = FetchType.LAZY)
