@@ -4,12 +4,13 @@ import com.service.consulta.consulta_service.domain.ConsultationStatus;
 import com.service.consulta.consulta_service.domain.ConsultationType;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record ConsultationSummaryResponse(
-        Long id,
-        Long appointmentId,
-        Long patientId,
-        Long doctorId,
+        UUID id,
+        UUID appointmentId,
+        UUID patientId,
+        UUID doctorId,
         ConsultationType consultationType,
         ConsultationStatus status,
         LocalDateTime startedAt,

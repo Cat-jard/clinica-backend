@@ -6,11 +6,12 @@ import com.service.consulta.consulta_service.dtos.sections.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public record ConsultationRequest(
-        Long appointmentId,
-        Long patientId,
-        Long doctorId,
+        UUID appointmentId,
+        UUID patientId,
+        UUID doctorId,
         ConsultationType consultationType,
         ConsultationStatus status,
         LocalDateTime startedAt,

@@ -8,12 +8,13 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public record ConsultationResponse(
-        Long id,
-        Long appointmentId,
-        Long patientId,
-        Long doctorId,
+        UUID id,
+        UUID appointmentId,
+        UUID patientId,
+        UUID doctorId,
         ConsultationType consultationType,
         ConsultationStatus status,
         LocalDateTime startedAt,
