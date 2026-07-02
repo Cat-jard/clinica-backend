@@ -1,5 +1,6 @@
 package com.recepcion.service.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -10,6 +11,8 @@ public record PacienteResumenResponse(
     String apellidoPaterno,
     String apellidoMaterno,
     String nombres,
+    LocalDate fechaNacimiento,
+    String telefono,
     String nroHistoria,
     String aseguradora,
     String consentimiento,

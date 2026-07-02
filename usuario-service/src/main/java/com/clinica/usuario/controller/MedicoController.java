@@ -24,7 +24,7 @@ public class MedicoController {
         this.mapper = mapper;
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<UsuarioResponse>> listarMedicos() {
         var medicos = repositorio.buscar(Rol.MEDICO, null).stream()
                 .map(mapper::aResponse)

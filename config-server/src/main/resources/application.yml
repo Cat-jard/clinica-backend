@@ -21,8 +21,8 @@ spring:
 # ----- Eureka: el config-server se registra para poder descubrirse -----
 eureka:
   client:
-    service-url:
-      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+    serviceUrl:
+      defaultZone: http://eureka-server:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
   instance:

@@ -33,11 +33,15 @@ spring:
 
       # ----- Rutas hacia los microservicios (lb:// = balanceo via Eureka) -----
       routes:
-        # usuario-service: autenticacion, usuarios y roles
+        # usuario-service: autenticacion, usuarios, roles y medicos
         - id: usuario-auth
           uri: lb://usuario-service
           predicates:
             - Path=/api/auth/**
+        - id: usuario-public-medicos
+          uri: lb://usuario-service
+          predicates:
+            - Path=/api/public/medicos/**
         - id: usuario-usuarios
           uri: lb://usuario-service
           predicates:
