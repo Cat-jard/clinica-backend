@@ -1,0 +1,104 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  # ----- Config Server (opcional: el gateway arranca aunque el Config Server este caido) -----
+  config:
+    import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}"
+
+  cloud:
+    gateway:
+      # Descubre servicios en Eureka, pero SOLO enrutamos con las rutas explicitas de abajo.
+      discovery:
+        locator:
+          enabled: false
+          lower-case-service-id: true
+
+      # ----- CORS global: aqui es donde el frontend obtiene permiso para llamar al backend -----
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: ${CORS_ORIGINS:http://localhost:3000,http://localhost:5173}
+            allowedMethods: [GET, POST, PUT, PATCH, DELETE, OPTIONS]
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+      # Evita cabeceras CORS duplicadas cuando el servicio de destino tambien las emite.
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+
+      # ----- Rutas hacia los microservicios (lb:// = balanceo via Eureka) -----
+      routes:
+        # usuario-service: autenticacion, usuarios, roles y medicos
+        - id: usuario-auth
+          uri: lb://usuario-service
+          predicates:
+            - Path=/api/auth/**
+        - id: usuario-public-medicos
+          uri: lb://usuario-service
+          predicates:
+            - Path=/api/public/medicos/**
+        - id: usuario-usuarios
+          uri: lb://usuario-service
+          predicates:
+            - Path=/api/usuarios/**
+
+        # auditoria-service
+        - id: auditoria
+          uri: lb://auditoria-service
+          predicates:
+            - Path=/api/auditoria/**
+
+        # soporte-service (tickets)
+        - id: soporte-tickets
+          uri: lb://soporte-service
+          predicates:
+            - Path=/api/tickets/**
+
+        # recepcion-service (pacientes, cola)
+        - id: recepcion-pacientes
+          uri: lb://recepcion-service
+          predicates:
+            - Path=/api/pacientes/**
+        - id: recepcion-cola
+          uri: lb://recepcion-service
+          predicates:
+            - Path=/api/cola/**
+
+        # citas-service
+        - id: citas
+          uri: lb://citas-service
+          predicates:
+            - Path=/api/citas/**
+
+        # triaje-service
+        - id: triaje
+          uri: lb://triaje-service
+          predicates:
+            - Path=/api/triaje/**
+
+        # hospitalizacion-service
+        - id: hospitalizacion
+          uri: lb://hospitalizacion-service
+          predicates:
+            - Path=/api/hospitalizacion/**
+
+# ----- Eureka (descubrimiento) -----
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway

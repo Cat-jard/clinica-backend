@@ -1,0 +1,21 @@
+package com.triaje.service.feign.dto;
+
+import lombok.Data;
+
+import java.util.UUID;
+
+@Data
+public class PacienteResponse {
+    private UUID id;
+    private String tipoDocumento;
+    private String nroDocumento;
+    private String apellidoPaterno;
+    private String apellidoMaterno;
+    private String nombres;
+    private String fechaNacimiento;
+    private String sexo;
+    private String telefono;
+    private String aseguradora;
+    private String consentimiento;
+    private String nroHistoria;
+}

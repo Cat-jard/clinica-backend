@@ -30,10 +30,10 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
             SELECT u FROM Usuario u
             WHERE (:rol IS NULL OR u.rol = :rol)
               AND (:texto IS NULL OR
-                   LOWER(u.nombre)    LIKE LOWER(CONCAT('%', :texto, '%')) OR
-                   LOWER(u.apellidos) LIKE LOWER(CONCAT('%', :texto, '%')) OR
-                   u.dni   LIKE CONCAT('%', :texto, '%') OR
-                   LOWER(u.email)     LIKE LOWER(CONCAT('%', :texto, '%')))
+                   LOWER(u.nombre)    LIKE LOWER(CONCAT('%', CAST(:texto AS string), '%')) OR
+                   LOWER(u.apellidos) LIKE LOWER(CONCAT('%', CAST(:texto AS string), '%')) OR
+                   u.dni   LIKE CONCAT('%', CAST(:texto AS string), '%') OR
+                   LOWER(u.email)     LIKE LOWER(CONCAT('%', CAST(:texto AS string), '%')))
             ORDER BY u.fechaCreacion DESC
             """)
     List<Usuario> buscar(@Param("rol") Rol rol, @Param("texto") String texto);

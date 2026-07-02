@@ -1,0 +1,40 @@
+server:
+  port: 8004
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sihce_hospitalizacion
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+    open-in-view: false
+  cloud:
+    openfeign:
+      client:
+        config:
+          recepcion-service:
+            connect-timeout: 5000
+            read-timeout: 5000
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    com.hospitalizacion: DEBUG
+    org.springframework.cloud.openfeign: DEBUG
+
+recepcion:
+  api:
+    url: http://localhost:8001
