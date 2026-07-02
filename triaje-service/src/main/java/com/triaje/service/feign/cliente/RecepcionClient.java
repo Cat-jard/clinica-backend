@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-@FeignClient(name = "recepcion-service", url = "${recepcion.api.url:http://localhost:8081}")
+@FeignClient(name = "recepcion-service", url = "${recepcion.api.url:http://localhost:8001}")
 public interface RecepcionClient {
 
     @GetMapping("/pacientes/{id}")

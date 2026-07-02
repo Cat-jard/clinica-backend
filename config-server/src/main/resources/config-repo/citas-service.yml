@@ -3,10 +3,10 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/sihce_citas
+    url: jdbc:postgresql://localhost:5432/sihce_citas
     driver-class-name: org.postgresql.Driver
     username: postgres
-    password: admin
+    password: postgres
   jpa:
     hibernate:
       ddl-auto: update

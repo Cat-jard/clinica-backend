@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 import java.util.UUID;
 
-@FeignClient(name = "citas-service", url = "${citas.api.url:http://localhost:8082}")
+@FeignClient(name = "citas-service", url = "${citas.api.url:http://localhost:8002}")
 public interface CitaClient {
 
     @GetMapping("/api/citas/paciente/{pacienteId}")

@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/sihce_hospitalizacion
+    url: jdbc:postgresql://localhost:5432/sihce_hospitalizacion
     username: postgres
-    password: admin
+    password: postgres
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -37,4 +37,4 @@ logging:
 
 recepcion:
   api:
-    url: http://localhost:8081
+    url: http://localhost:8001

@@ -5,9 +5,9 @@ spring:
   application:
     name: triaje-service
   datasource:
-    url: jdbc:postgresql://localhost:5433/sihce_triaje
+    url: jdbc:postgresql://localhost:5432/sihce_triaje
     username: postgres
-    password: admin
+    password: postgres
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -44,11 +44,11 @@ logging:
 
 citas:
   api:
-    url: http://localhost:8082
+    url: http://localhost:8002
 
 recepcion:
   api:
-    url: http://localhost:8081
+    url: http://localhost:8001
 
 eureka:
   client:

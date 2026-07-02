@@ -20,9 +20,9 @@ public interface PacienteRepository extends JpaRepository<Paciente, UUID> {
     Optional<String> findLastNroHistoriaByPrefix(@Param("prefix") String prefix);
 
     @Query("SELECT p FROM Paciente p WHERE " +
-           "(:q IS NULL OR LOWER(p.nroDocumento) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
-           "LOWER(p.nombres) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
-           "LOWER(p.apellidoPaterno) LIKE LOWER(CONCAT('%', :q, '%')) OR " +
-           "LOWER(p.apellidoMaterno) LIKE LOWER(CONCAT('%', :q, '%')))")
+           "(:q IS NULL OR LOWER(p.nroDocumento) LIKE LOWER(CONCAT('%', CAST(:q AS string), '%')) OR " +
+           "LOWER(p.nombres) LIKE LOWER(CONCAT('%', CAST(:q AS string), '%')) OR " +
+           "LOWER(p.apellidoPaterno) LIKE LOWER(CONCAT('%', CAST(:q AS string), '%')) OR " +
+           "LOWER(p.apellidoMaterno) LIKE LOWER(CONCAT('%', CAST(:q AS string), '%')))")
     Page<Paciente> search(@Param("q") String q, Pageable pageable);
 }

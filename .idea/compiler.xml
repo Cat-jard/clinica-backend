@@ -13,7 +13,7 @@
         <module name="eureka-server" />
         <module name="auditoria-service" />
       </profile>
-      <profile name="Annotation profile for hospitalizacion-service" enabled="true">
+      <profile name="Annotation profile for triaje-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />

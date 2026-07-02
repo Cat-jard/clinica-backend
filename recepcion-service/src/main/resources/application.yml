@@ -2,10 +2,10 @@ spring:
   application:
     name: recepcion-service
   datasource:
-    url: jdbc:postgresql://localhost:5433/recepcion_db
+    url: jdbc:postgresql://localhost:5432/recepcion_db
     driver-class-name: org.postgresql.Driver
     username: postgres
-    password: admin
+    password: postgres
   jpa:
     hibernate:
       ddl-auto: update

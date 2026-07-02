@@ -5,7 +5,7 @@ package com.clinica.auditoria.dto;
  * (accion como etiqueta en espanol y fecha ya formateada).
  */
 public record AuditoriaResponse(
-        long id,
+        String id,
         String usuarioEmail,
         String usuarioNombre,
         String rol,
