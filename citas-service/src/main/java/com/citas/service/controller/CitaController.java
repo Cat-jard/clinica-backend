@@ -23,7 +23,7 @@ public class CitaController {
 
     private final CitaService citaService;
 
-    @PostMapping
+    @PostMapping("/crear")
     public ResponseEntity<ApiResponse<CitaResponse>> create(@Valid @RequestBody CitaRequest request) {
         CitaResponse data = citaService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -36,7 +36,7 @@ public class CitaController {
         return ResponseEntity.ok(ApiResponse.ok(data));
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<ApiResponse<Page<CitaResponse>>> findAll(
             @RequestParam(required = false) String estado,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,

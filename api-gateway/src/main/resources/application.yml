@@ -55,6 +55,34 @@ spring:
           predicates:
             - Path=/api/tickets/**
 
+        # recepcion-service (pacientes, cola)
+        - id: recepcion-pacientes
+          uri: lb://recepcion-service
+          predicates:
+            - Path=/api/pacientes/**
+        - id: recepcion-cola
+          uri: lb://recepcion-service
+          predicates:
+            - Path=/api/cola/**
+
+        # citas-service
+        - id: citas
+          uri: lb://citas-service
+          predicates:
+            - Path=/api/citas/**
+
+        # triaje-service
+        - id: triaje
+          uri: lb://triaje-service
+          predicates:
+            - Path=/api/triaje/**
+
+        # hospitalizacion-service
+        - id: hospitalizacion
+          uri: lb://hospitalizacion-service
+          predicates:
+            - Path=/api/hospitalizacion/**
+
 # ----- Eureka (descubrimiento) -----
 eureka:
   client:

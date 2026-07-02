@@ -19,7 +19,7 @@ spring:
       enabled: false
 
 server:
-  port: 8081
+  port: 8001
 
 logging:
   level:
