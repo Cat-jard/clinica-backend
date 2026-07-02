@@ -4,6 +4,7 @@ import com.service.consulta.consulta_service.domain.Consultation;
 import com.service.consulta.consulta_service.domain.InterconsultationPriority;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -40,6 +41,7 @@ public class Interconsultation {
     private InterconsultationPriority priority;
 
     @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)

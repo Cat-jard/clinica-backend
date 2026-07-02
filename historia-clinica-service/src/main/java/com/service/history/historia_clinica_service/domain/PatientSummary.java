@@ -3,6 +3,7 @@ package com.service.history.historia_clinica_service.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
@@ -19,12 +20,11 @@ import java.util.UUID;
 @Table(name = "patient_summary")
 public class PatientSummary {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "patient_id")
     private UUID patientId;
 
     @Column(nullable = false, length = 200)
-    private String fullname;
+    private String fullName;
 
     @Column(nullable = false, length = 8)
     private String dni;
@@ -45,5 +45,7 @@ public class PatientSummary {
     @Column(columnDefinition = "jsonb")
     private List<String> allergies;
 
+    @UpdateTimestamp
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 }

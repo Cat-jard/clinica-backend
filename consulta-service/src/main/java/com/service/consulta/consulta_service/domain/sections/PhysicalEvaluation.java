@@ -7,7 +7,7 @@ import lombok.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "physica_evaluation")
+@Table(name = "physical_evaluation")
 @Getter
 @Setter
 @NoArgsConstructor

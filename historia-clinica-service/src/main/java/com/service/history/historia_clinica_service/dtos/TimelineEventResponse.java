@@ -9,7 +9,7 @@ import java.util.UUID;
 public record TimelineEventResponse(
         UUID id,
         EventType type,
-        LocalDateTime ocurredAt,
+        LocalDateTime occurredAt,
         String sourceService,
         TimeLineEventData data
 ) {

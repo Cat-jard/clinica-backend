@@ -26,6 +26,7 @@ public record ConsultationResponse(
         PrescriptionDTO prescription,
         List<DiagnosisDTO> diagnoses,
         List<CurrentMedicationDTO> currentMedicationList,
-        List<ProcedurePerformedDTO> procedures
+        List<ProcedurePerformedDTO> procedures,
+        List<InterconsultationResponse> interconsultations
 ) {
 }
