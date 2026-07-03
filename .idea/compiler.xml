@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -12,6 +13,16 @@
         <module name="soporte-service" />
         <module name="eureka-server" />
         <module name="auditoria-service" />
+      </profile>
+      <profile name="Annotation profile for historia-clinica-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
+        </processorPath>
+        <module name="historia-clinica-service" />
+        <module name="consulta-service" />
       </profile>
       <profile name="Annotation profile for triaje-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -34,7 +45,9 @@
       <module name="auditoria-service" options="-parameters" />
       <module name="citas-service" options="-parameters" />
       <module name="config-server" options="-parameters" />
+      <module name="consulta-service" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
+      <module name="historia-clinica-service" options="-parameters" />
       <module name="hospitalizacion-service" options="-parameters" />
       <module name="recepcion-service" options="-parameters" />
       <module name="soporte-service" options="-parameters" />
