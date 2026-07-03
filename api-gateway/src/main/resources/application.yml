@@ -22,7 +22,7 @@ spring:
         cors-configurations:
           '[/**]':
             allowedOrigins: ${CORS_ORIGINS:http://localhost:3000,http://localhost:5173}
-            allowedMethods: [GET, POST, PUT, PATCH, DELETE, OPTIONS]
+            allowedMethods: [ GET, POST, PUT, PATCH, DELETE, OPTIONS ]
             allowedHeaders: "*"
             allowCredentials: true
             maxAge: 3600
@@ -86,6 +86,17 @@ spring:
           uri: lb://hospitalizacion-service
           predicates:
             - Path=/api/hospitalizacion/**
+        - id: consulta
+          uri: lb://consulta-service
+          predicates:
+            - Path=/api/consultation
+        - id: historia-clinica
+          uri:
+            - lb://historia-clinica-service
+          predicates:
+            - Path=/api/history-events/**
+            - Path=/api/patient-summaries/**
+
 
 # ----- Eureka (descubrimiento) -----
 eureka:
