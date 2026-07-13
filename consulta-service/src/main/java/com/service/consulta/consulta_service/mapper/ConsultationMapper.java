@@ -5,7 +5,11 @@ import com.service.consulta.consulta_service.dtos.ConsultationRequest;
 import com.service.consulta.consulta_service.dtos.ConsultationResponse;
 import com.service.consulta.consulta_service.dtos.ConsultationSummaryResponse;
 import com.service.consulta.consulta_service.mapper.sections.*;
+import com.service.consulta.consulta_service.rabbit.ConsultationCompletedEvent;
+import com.service.consulta.consulta_service.rabbit.ConsultationEventData;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
 
 @Component
 public class ConsultationMapper {
@@ -138,6 +142,42 @@ public class ConsultationMapper {
                         .stream()
                         .map(interconsultationMapper::toResponse)
                         .toList()
+        );
+    }
+
+    public ConsultationCompletedEvent toEvent(Consultation consultation) {
+        return new ConsultationCompletedEvent(
+                consultation.getPatientId(),
+                consultation.getId(),
+                consultation.getAppointmentId(),
+                consultation.getDoctorId(),
+                consultation.getFinishedAt() != null
+                        ? consultation.getFinishedAt()
+                        : LocalDateTime.now(),
+                new ConsultationEventData(
+                        consultation.getConsultationType(),
+                        consultation.getStatus(),
+                        anamnesisMapper.toDTO(consultation.getAnamnesis()),
+                        physicalEvaluationMapper.toDTO(consultation.getPhysicalEvaluation()),
+                        clinicalPlanMapper.toDTO(consultation.getClinicalPlan()),
+                        consultation.getDiagnoses()
+                                .stream()
+                                .map(diagnosisMapper::toDTO)
+                                .toList(),
+                        consultation.getCurrentMedicationList()
+                                .stream()
+                                .map(currentMedicationMapper::toDTO)
+                                .toList(),
+                        prescriptionMapper.toDTO(consultation.getPrescription()),
+                        consultation.getProcedures()
+                                .stream()
+                                .map(procedurePerformedMapper::toDTO)
+                                .toList(),
+                        consultation.getInterconsultations()
+                                .stream()
+                                .map(interconsultationMapper::toResponse)
+                                .toList()
+                )
         );
     }
 

@@ -41,7 +41,7 @@ public class CitaService {
         validarMedico(request.getMedicoId());
 
         if (request.getHoraInicio().isAfter(request.getHoraFin()) ||
-            request.getHoraInicio().equals(request.getHoraFin())) {
+                request.getHoraInicio().equals(request.getHoraFin())) {
             throw new BadRequestException("La hora de inicio debe ser anterior a la hora de fin");
         }
 
@@ -49,7 +49,7 @@ public class CitaService {
                 request.getMedicoId(), request.getFechaCita());
         for (Cita c : ocupadas) {
             if (horariosSeSolapan(request.getHoraInicio(), request.getHoraFin(),
-                                  c.getHoraInicio(), c.getHoraFin())) {
+                    c.getHoraInicio(), c.getHoraFin())) {
                 throw new ConflictException("El medico ya tiene una cita en ese horario");
             }
         }

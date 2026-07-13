@@ -6,28 +6,31 @@ import com.service.consulta.consulta_service.dtos.ConsultationResponse;
 import com.service.consulta.consulta_service.dtos.ConsultationSummaryResponse;
 import com.service.consulta.consulta_service.exception.ResourceNotFoundException;
 import com.service.consulta.consulta_service.mapper.ConsultationMapper;
+import com.service.consulta.consulta_service.rabbit.ConsultationCompletedEvent;
+import com.service.consulta.consulta_service.rabbit.ConsultationEventData;
+import com.service.consulta.consulta_service.rabbit.Publisher;
 import com.service.consulta.consulta_service.repository.ConsultationRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ConsultationService {
     private final ConsultationRepository repository;
-
+    private final Publisher publisher;
     private final ConsultationMapper mapper;
 
-    public ConsultationService(ConsultationRepository repository, ConsultationMapper mapper) {
-        this.repository = repository;
-        this.mapper = mapper;
-    }
-
+    @Transactional
     public ConsultationResponse create(ConsultationRequest request) {
         Consultation consultation = mapper.toEntity(request);
         Consultation saved = repository.save(consultation);
+        publisher.publish(mapper.toEvent(saved));
         return mapper.toResponse(saved);
     }
 
