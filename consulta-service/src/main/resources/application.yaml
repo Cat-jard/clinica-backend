@@ -1,0 +1,27 @@
+server:
+  port: 8172
+spring:
+  application:
+    name: consulta-service
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    ddl-auto: update
+    show-sql: true
+    hibernate:
+      format-sql: true
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    url: jdbc:postgresql://localhost:5432/consulta_db
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: password
+eureka:
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+  client:
+    enabled: false
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}

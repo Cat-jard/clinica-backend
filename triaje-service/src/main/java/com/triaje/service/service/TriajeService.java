@@ -6,6 +6,9 @@ import com.triaje.service.exception.*;
 import com.triaje.service.feign.cliente.CitaClient;
 import com.triaje.service.feign.cliente.RecepcionClient;
 import com.triaje.service.mapper.TriajeMapper;
+import com.triaje.service.rabbit.Publisher;
+import com.triaje.service.rabbit.TriageCompletedEvent;
+import com.triaje.service.rabbit.TriageEventData;
 import com.triaje.service.repository.*;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +43,7 @@ public class TriajeService {
     private final TriajeMapper mapper;
     private final CitaClient citaClient;
     private final RecepcionClient recepcionClient;
+    private final Publisher publisher;
 
     public List<ColaTriajeResponse> obtenerColaTriaje(LocalDate fecha) {
         try {
@@ -95,7 +99,7 @@ public class TriajeService {
 
     public RegistroTriajeResponse registrarTriaje(RegistrarTriajeRequest request) {
         if (request.getSignos().getSpo2() < 90 &&
-            ("IV-VERDE".equals(request.getPrioridad()) || "V-AZUL".equals(request.getPrioridad()))) {
+                ("IV-VERDE".equals(request.getPrioridad()) || "V-AZUL".equals(request.getPrioridad()))) {
             throw new InvalidPrioridadException(
                     "SpO2 menor a 90: no se puede asignar prioridad " + request.getPrioridad());
         }
@@ -161,6 +165,7 @@ public class TriajeService {
             obs.setEstado("EN_OBSERVACION");
             observacionRepository.save(obs);
         }
+        publisher.publish(buildTriageEvent(registro, signos));
 
         return toRegistroResponse(registro, signos);
     }
@@ -411,6 +416,27 @@ public class TriajeService {
                 r.getTimestamp(), signosDTO);
     }
 
+    private TriageCompletedEvent buildTriageEvent(RegistroTriaje r, SignosVitales s) {
+        return new TriageCompletedEvent(
+                r.getPacienteId(), r.getId(), r.getTimestamp(),
+                new TriageEventData(
+                        r.getMedicoNombre(),
+                        r.getMotivoConsulta(),
+                        r.getPrioridad(),
+                        r.getNivelConciencia(),
+                        r.getDolor(),
+                        s.getPasSistolica(),
+                        s.getPasDiastolica(),
+                        s.getFrecCardiaca(),
+                        s.getFrecRespiratoria(),
+                        s.getTemperatura(),
+                        s.getSpo2(),
+                        s.getPeso(),
+                        BigDecimal.valueOf(s.getTalla())
+                )
+        );
+    }
+
     private EntradaKardexResponse toKardexResponse(EntradaKardex e) {
         List<MedicamentoKardexDTO> meds = new ArrayList<>();
         if (e.getMedicamentos() != null) {
@@ -442,5 +468,6 @@ public class TriajeService {
     public record PacienteConCitaDto(
             UUID pacienteId, String pacienteNombre, String pacienteDni, String nroHistoria,
             UUID ultimaCitaId, Long medicoId, String medicoNombre,
-            UUID especialidadId, String especialidadNombre, boolean conCita) {}
+            UUID especialidadId, String especialidadNombre, boolean conCita) {
+    }
 }
