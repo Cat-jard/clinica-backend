@@ -3,6 +3,11 @@ server:
 spring:
   application:
     name: historia-clinica-service
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     ddl-auto: update
@@ -20,7 +25,6 @@ eureka:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${server.port}
   client:
-    enabled: false
     register-with-eureka: true
     fetch-registry: true
     service-url:

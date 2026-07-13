@@ -35,9 +35,9 @@ public class PatientSummary {
     @Column(nullable = false)
     private SexType sex;
 
-    private Short systolicPressure;
-    private Short diastolicPressure;
-    private Short spo2;
+    private Integer systolicPressure;
+    private Integer diastolicPressure;
+    private Integer spo2;
     private BigDecimal weight;
     private BigDecimal height;
 

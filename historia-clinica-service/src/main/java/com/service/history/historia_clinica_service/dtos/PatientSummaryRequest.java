@@ -12,9 +12,9 @@ public record PatientSummaryRequest(
         String dni,
         Short age,
         SexType sex,
-        Short systolicPressure,
-        Short diastolicPressure,
-        Short spo2,
+        Integer systolicPressure,
+        Integer diastolicPressure,
+        Integer spo2,
         BigDecimal weight,
         BigDecimal height,
         List<String> allergies

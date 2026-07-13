@@ -11,8 +11,6 @@ public record MedicalHistoryEventRequest(
         LocalDateTime occurredAt,
         String sourceService,
         UUID referenceId,
-        //Using the generic to map the JSON
-        //What this "object" projection looks like is determined by each service
         Object projection
 ) {
 }
