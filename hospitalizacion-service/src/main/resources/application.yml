@@ -5,9 +5,9 @@ spring:
   application:
     name: hospitalizacion-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/sihce_hospitalizacion
+    url: jdbc:postgresql://localhost:5433/sihce_hospitalizacion
     username: postgres
-    password: postgres
+    password: admin
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

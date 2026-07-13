@@ -15,7 +15,7 @@ public enum Rol {
     MEDICO      ("Médico",      "/medico",        "Médico"),
     LABORATORIO ("Laboratorio", "/laboratorio",   "Laboratorio Clínico"),
     RADIOLOGO   ("Radiólogo",   "/radiologo",     "Médico Radiólogo"),
-    FARMACIA    ("Farmacia",    "/admin",         "Farmacia"),
+    FARMACIA    ("Farmacia",    "/farmacia",       "Farmacia"),
     SOPORTE     ("Soporte",     "/soporte",       "Soporte Técnico / TI"),
     PACIENTE    ("Paciente",    "/portal",        "Portal del Paciente");
 

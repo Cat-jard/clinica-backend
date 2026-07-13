@@ -87,6 +87,16 @@ spring:
           predicates:
             - Path=/api/hospitalizacion/**
 
+        # inventario-service (productos, movimientos de stock)
+        - id: inventario-productos
+          uri: lb://inventario-service
+          predicates:
+            - Path=/api/productos/**
+        - id: inventario-movimientos
+          uri: lb://inventario-service
+          predicates:
+            - Path=/api/movimientos/**
+
 # ----- Eureka (descubrimiento) -----
 eureka:
   client:

@@ -57,6 +57,12 @@ public class Cita {
     @Column(name = "numero_historia", length = 20)
     private String numeroHistoria;
 
+    @Column(name = "paciente_nombre", length = 300)
+    private String pacienteNombre;
+
+    @Column(name = "medico_nombre", length = 200)
+    private String medicoNombre;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

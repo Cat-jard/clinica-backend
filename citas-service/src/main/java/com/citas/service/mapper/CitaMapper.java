@@ -10,6 +10,8 @@ public interface CitaMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "numeroHistoria", ignore = true)
+    @Mapping(target = "pacienteNombre", ignore = true)
+    @Mapping(target = "medicoNombre", ignore = true)
     @Mapping(target = "estado", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
