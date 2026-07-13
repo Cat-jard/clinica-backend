@@ -1,0 +1,7 @@
+Para "instalar" rabbitmq vas a usar docker y correr el siguiente comando:
+docker run -it --name rabbitmq -p 5672:5672 -p 15672 rabbitmq:4.3.2-management
+Una vez esté corriendo vas a entrar a tu navegador a: http://localhost:15672
+ALlí podrás ver el panel del rabbit.
+Para detenerlo puedes: presionar CRTL+C y luego presionando A (para seleccionar ABORT en las opciones que te aparezcan)
+O desde otra ventana de terminal simplemente detenerlo con "docker container stop" y la id del contenedor (que puedes encontrar escribiendo docker ps -a)
+- docker container stop ID_CONTENEDOR
