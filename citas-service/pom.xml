@@ -49,6 +49,21 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <!-- Flyway (migraciones de BD relacional). Version gestionada por el BOM de Spring Boot. -->
+        <!-- IMPORTANTE (Spring Boot 4): la autoconfiguracion de Flyway se movio a este
+             modulo aparte; sin el, flyway-core esta en el classpath pero NO se ejecuta. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-flyway</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

@@ -10,17 +10,22 @@ spring:
       enabled: false
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/clinica_inventario
-    username: postgres
-    password: admin
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:clinica_inventario}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
       minimum-idle: 5
 
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
   jpa:
     hibernate:
-      ddl-auto: update
+      # Flyway gestiona el esquema; Hibernate solo valida.
+      ddl-auto: validate
     show-sql: false
     properties:
       hibernate:

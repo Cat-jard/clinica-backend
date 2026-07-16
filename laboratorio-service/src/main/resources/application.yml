@@ -16,13 +16,18 @@ spring:
             connect-timeout: 5000
             read-timeout: 5000
   datasource:
-    url: jdbc:postgresql://localhost:5433/sihce_laboratorio
-    username: postgres
-    password: admin
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:sihce_laboratorio}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
   jpa:
     hibernate:
-      ddl-auto: update
+      # Flyway gestiona el esquema; Hibernate solo valida.
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
