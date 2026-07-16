@@ -50,7 +50,7 @@ public class RegistroTriaje {
     @Column(name = "cita_id")
     private UUID citaId;
 
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 20)
     private String ticket;
 
     @Column(name = "hora_llegada", nullable = false)
@@ -68,7 +68,7 @@ public class RegistroTriaje {
     @Column(nullable = false)
     private Integer dolor;
 
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 20)
     private String prioridad;
 
     @Column(nullable = false, length = 40)

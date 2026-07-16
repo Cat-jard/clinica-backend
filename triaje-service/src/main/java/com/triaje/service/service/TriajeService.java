@@ -49,8 +49,8 @@ public class TriajeService {
                     .filter(p -> "EN_ESPERA".equals(p.getEstado()))
                     .map(p -> new ColaTriajeResponse(
                             p.getId(), p.getPacienteId(), p.getPacienteNombre(),
-                            p.getTicket(), p.getHoraLlegada(), p.getMedicoNombre(),
-                            p.getEspecialidad(), p.getMotivo(), p.getCitaId()))
+                            p.getPacienteDni(), p.getTicket(), p.getHoraLlegada(),
+                            p.getMedicoNombre(), p.getEspecialidad(), p.getMotivo(), p.getCitaId()))
                     .toList();
         } catch (FeignException e) {
             throw new RecepcionServiceException("Error al obtener cola de triaje: " + e.getMessage(), e);
@@ -173,8 +173,17 @@ public class TriajeService {
     }
 
     public Page<RegistroTriajeResponse> listarRegistros(LocalDate fecha, String prioridad, Pageable pageable) {
-        return registroTriajeRepository.buscarConFiltros(fecha, prioridad, pageable)
-                .map(r -> toRegistroResponse(r, r.getSignosVitales()));
+        Page<RegistroTriaje> page;
+        if (fecha != null && prioridad != null) {
+            page = registroTriajeRepository.findByFechaTriajeAndPrioridadOrderByTimestampDesc(fecha, prioridad, pageable);
+        } else if (fecha != null) {
+            page = registroTriajeRepository.findByFechaTriajeOrderByTimestampDesc(fecha, pageable);
+        } else if (prioridad != null) {
+            page = registroTriajeRepository.findByPrioridadOrderByTimestampDesc(prioridad, pageable);
+        } else {
+            page = registroTriajeRepository.findAll(pageable);
+        }
+        return page.map(r -> toRegistroResponse(r, r.getSignosVitales()));
     }
 
     public EntradaKardexResponse crearKardex(CrearKardexRequest request) {

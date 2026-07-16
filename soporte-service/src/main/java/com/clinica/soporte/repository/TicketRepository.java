@@ -24,9 +24,9 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
             WHERE (:estado IS NULL OR t.estado = :estado)
               AND (:prioridad IS NULL OR t.prioridad = :prioridad)
               AND (:texto IS NULL OR
-                   LOWER(t.codigo)            LIKE LOWER(CONCAT('%', :texto, '%')) OR
-                   LOWER(t.titulo)            LIKE LOWER(CONCAT('%', :texto, '%')) OR
-                   LOWER(t.solicitanteNombre) LIKE LOWER(CONCAT('%', :texto, '%')))
+                   LOWER(t.codigo)            LIKE LOWER(CONCAT('%', CAST(:texto AS string), '%')) OR
+                   LOWER(t.titulo)            LIKE LOWER(CONCAT('%', CAST(:texto AS string), '%')) OR
+                   LOWER(t.solicitanteNombre) LIKE LOWER(CONCAT('%', CAST(:texto AS string), '%')))
             ORDER BY t.fechaCreacion DESC
             """)
     List<Ticket> buscar(@Param("estado") EstadoTicket estado,

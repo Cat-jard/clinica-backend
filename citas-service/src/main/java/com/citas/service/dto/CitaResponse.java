@@ -17,6 +17,8 @@ public record CitaResponse(
     String observaciones,
     String tipoSeguro,
     String numeroHistoria,
+    String pacienteNombre,
+    String medicoNombre,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {}

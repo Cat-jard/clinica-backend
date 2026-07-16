@@ -17,11 +17,9 @@ public interface RegistroTriajeRepository extends JpaRepository<RegistroTriaje, 
 
     Page<RegistroTriaje> findByFechaTriajeOrderByTimestampDesc(LocalDate fechaTriaje, Pageable pageable);
 
-    @Query("SELECT r FROM RegistroTriaje r WHERE (:fecha IS NULL OR r.fechaTriaje = :fecha) " +
-           "AND (:prioridad IS NULL OR r.prioridad = :prioridad) ORDER BY r.timestamp DESC")
-    Page<RegistroTriaje> buscarConFiltros(@Param("fecha") LocalDate fecha,
-                                           @Param("prioridad") String prioridad,
-                                           Pageable pageable);
+    Page<RegistroTriaje> findByFechaTriajeAndPrioridadOrderByTimestampDesc(LocalDate fecha, String prioridad, Pageable pageable);
+
+    Page<RegistroTriaje> findByPrioridadOrderByTimestampDesc(String prioridad, Pageable pageable);
 
     long countByFechaTriaje(LocalDate fecha);
 

@@ -44,11 +44,11 @@ logging:
 
 citas:
   api:
-    url: http://localhost:8082
+    url: http://localhost:8002
 
 recepcion:
   api:
-    url: http://localhost:8081
+    url: http://localhost:8001
 
 eureka:
   client:

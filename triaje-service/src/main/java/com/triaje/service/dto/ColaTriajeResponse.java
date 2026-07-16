@@ -6,6 +6,7 @@ public record ColaTriajeResponse(
     UUID id,
     UUID pacienteId,
     String pacienteNombre,
+    String pacienteDni,
     String ticket,
     String horaLlegada,
     String medicoNombre,

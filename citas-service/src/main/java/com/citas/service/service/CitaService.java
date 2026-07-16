@@ -37,8 +37,7 @@ public class CitaService {
     private final UsuarioClient usuarioClient;
 
     public CitaResponse create(CitaRequest request) {
-        validarPaciente(request.getPacienteId());
-        validarMedico(request.getMedicoId());
+        String medicoNombre = validarMedico(request.getMedicoId());
 
         if (request.getHoraInicio().isAfter(request.getHoraFin()) ||
             request.getHoraInicio().equals(request.getHoraFin())) {
@@ -55,10 +54,13 @@ public class CitaService {
         }
 
         PacienteResponse paciente = obtenerPaciente(request.getPacienteId());
+        String pacienteNombre = paciente.nombres() + " " + paciente.apellidoPaterno() + " " + (paciente.apellidoMaterno() != null ? paciente.apellidoMaterno() : "");
 
         Cita cita = citaMapper.toEntity(request);
         cita.setEstado("PROGRAMADA");
         cita.setNumeroHistoria(paciente.nroHistoria());
+        cita.setPacienteNombre(pacienteNombre.trim());
+        cita.setMedicoNombre(medicoNombre);
         cita = citaRepository.save(cita);
         return citaMapper.toResponse(cita);
     }
@@ -129,13 +131,10 @@ public class CitaService {
         );
     }
 
-    private void validarPaciente(UUID pacienteId) {
-        obtenerPaciente(pacienteId);
-    }
-
-    private void validarMedico(Long medicoId) {
+    private String validarMedico(Long medicoId) {
         try {
-            usuarioClient.obtenerMedico(medicoId);
+            var medico = usuarioClient.obtenerMedico(medicoId);
+            return medico.nombre() + " " + medico.apellidos();
         } catch (FeignException.NotFound e) {
             throw new ResourceNotFoundException("Medico no encontrado con id " + medicoId);
         }

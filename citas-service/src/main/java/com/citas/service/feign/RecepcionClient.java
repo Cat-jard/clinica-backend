@@ -11,6 +11,6 @@ import java.util.UUID;
 @FeignClient(name = "recepcion-service")
 public interface RecepcionClient {
 
-    @GetMapping("/pacientes/{id}")
+    @GetMapping("/api/pacientes/{id}")
     ApiResponse<PacienteResponse> obtenerPaciente(@PathVariable("id") UUID id);
 }

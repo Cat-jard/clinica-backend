@@ -13,7 +13,9 @@
         <module name="eureka-server" />
         <module name="auditoria-service" />
       </profile>
-      <profile name="Annotation profile for triaje-service" enabled="true">
+
+      <profile name="Annotation profile for inventario-service" enabled="true">
+
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -24,6 +26,7 @@
         </processorPath>
         <module name="hospitalizacion-service" />
         <module name="citas-service" />
+        <module name="inventario-service" />
         <module name="triaje-service" />
         <module name="recepcion-service" />
       </profile>
@@ -37,6 +40,7 @@
       <module name="config-server" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
       <module name="hospitalizacion-service" options="-parameters" />
+      <module name="inventario-service" options="-parameters" />
       <module name="recepcion-service" options="-parameters" />
       <module name="soporte-service" options="-parameters" />
       <module name="triaje-service" options="-parameters" />

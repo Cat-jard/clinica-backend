@@ -19,5 +19,7 @@ public record PacienteResponse(
     String aseguradora,
     String nroHistoria,
     String alergias,
-    LocalDateTime createdAt
+    String consentimiento,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt
 ) {}

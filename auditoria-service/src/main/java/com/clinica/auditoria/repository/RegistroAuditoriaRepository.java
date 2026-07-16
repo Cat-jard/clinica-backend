@@ -19,12 +19,12 @@ public interface RegistroAuditoriaRepository extends JpaRepository<RegistroAudit
     @Query("""
             SELECT r FROM RegistroAuditoria r
             WHERE (:accion IS NULL OR r.accion = :accion)
-              AND (:modulo IS NULL OR LOWER(r.modulo) = LOWER(:modulo))
+              AND (:modulo IS NULL OR LOWER(r.modulo) = LOWER(CAST(:modulo AS string)))
               AND (:texto IS NULL OR
-                   LOWER(r.usuarioNombre) LIKE LOWER(CONCAT('%', :texto, '%')) OR
-                   LOWER(r.usuarioEmail)  LIKE LOWER(CONCAT('%', :texto, '%')) OR
-                   LOWER(r.descripcion)   LIKE LOWER(CONCAT('%', :texto, '%')) OR
-                   LOWER(r.entidad)       LIKE LOWER(CONCAT('%', :texto, '%')))
+                   LOWER(r.usuarioNombre) LIKE LOWER(CONCAT('%', CAST(:texto AS string), '%')) OR
+                   LOWER(r.usuarioEmail)  LIKE LOWER(CONCAT('%', CAST(:texto AS string), '%')) OR
+                   LOWER(r.descripcion)   LIKE LOWER(CONCAT('%', CAST(:texto AS string), '%')) OR
+                   LOWER(r.entidad)       LIKE LOWER(CONCAT('%', CAST(:texto AS string), '%')))
             ORDER BY r.fecha DESC
             """)
     List<RegistroAuditoria> buscar(@Param("accion") AccionAuditoria accion,
