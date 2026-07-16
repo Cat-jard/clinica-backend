@@ -1,0 +1,50 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: laboratorio-service
+  config:
+    import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}"
+  cloud:
+    compatibility-verifier:
+      enabled: false
+    openfeign:
+      client:
+        config:
+          radiologia-service:
+            connect-timeout: 5000
+            read-timeout: 5000
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sihce_laboratorio
+    username: postgres
+    password: root
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: false
+    open-in-view: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+radiologia:
+  api:
+    url: ${RADIOLOGIA_API_URL:http://localhost:8085}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

@@ -87,6 +87,22 @@ spring:
           predicates:
             - Path=/api/hospitalizacion/**
 
+        # laboratorio-service: solicitud firmada de examenes y cola de laboratorio
+        - id: solicitudes-examenes
+          uri: lb://laboratorio-service
+          predicates:
+            - Path=/api/solicitudes-examenes,/api/solicitudes-examenes/**
+        - id: laboratorio
+          uri: lb://laboratorio-service
+          predicates:
+            - Path=/api/laboratorio/**
+
+        # radiologia-service: cola de lectura e informes de imagenes
+        - id: radiologia
+          uri: lb://radiologia-service
+          predicates:
+            - Path=/api/radiologia/**
+
 # ----- Eureka (descubrimiento) -----
 eureka:
   client:
