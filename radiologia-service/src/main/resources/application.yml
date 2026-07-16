@@ -1,5 +1,5 @@
 server:
-  port: 8085
+  port: 8101
 
 spring:
   application:
@@ -10,9 +10,9 @@ spring:
     compatibility-verifier:
       enabled: false
   datasource:
-    url: jdbc:postgresql://localhost:5432/sihce_radiologia
+    url: jdbc:postgresql://localhost:5433/sihce_radiologia
     username: postgres
-    password: root
+    password: admin
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

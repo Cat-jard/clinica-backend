@@ -8,6 +8,8 @@
     <file url="file://$PROJECT_DIR$/eureka-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/hospitalizacion-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/inventario-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/laboratorio-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/radiologia-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/recepcion-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/soporte-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/triaje-service/src/main/java" charset="UTF-8" />

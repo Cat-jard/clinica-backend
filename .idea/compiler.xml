@@ -7,15 +7,15 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="usuario-service" />
-        <module name="api-gateway" />
         <module name="config-server" />
+        <module name="auditoria-service" />
+        <module name="radiologia-service" />
+        <module name="api-gateway" />
+        <module name="laboratorio-service" />
         <module name="soporte-service" />
         <module name="eureka-server" />
-        <module name="auditoria-service" />
       </profile>
-
       <profile name="Annotation profile for inventario-service" enabled="true">
-
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -41,6 +41,8 @@
       <module name="eureka-server" options="-parameters" />
       <module name="hospitalizacion-service" options="-parameters" />
       <module name="inventario-service" options="-parameters" />
+      <module name="laboratorio-service" options="-parameters" />
+      <module name="radiologia-service" options="-parameters" />
       <module name="recepcion-service" options="-parameters" />
       <module name="soporte-service" options="-parameters" />
       <module name="triaje-service" options="-parameters" />

@@ -1,5 +1,5 @@
 server:
-  port: 8084
+  port: 8100
 
 spring:
   application:
@@ -16,9 +16,9 @@ spring:
             connect-timeout: 5000
             read-timeout: 5000
   datasource:
-    url: jdbc:postgresql://localhost:5432/sihce_laboratorio
+    url: jdbc:postgresql://localhost:5433/sihce_laboratorio
     username: postgres
-    password: root
+    password: admin
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
