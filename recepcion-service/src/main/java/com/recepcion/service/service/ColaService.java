@@ -53,11 +53,28 @@ public class ColaService {
                 .toList();
     }
 
+    public void actualizarEstado(UUID id, UUID pacienteId, String estado) {
+        if (id != null) {
+            Cola cola = colaRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Entrada de cola no encontrada"));
+            cola.setEstado(estado);
+            colaRepository.save(cola);
+        } else if (pacienteId != null) {
+            LocalDate hoy = LocalDate.now();
+            List<Cola> todayItems = colaRepository.findByFechaOrderByTicketAsc(hoy);
+            Cola cola = todayItems.stream()
+                    .filter(c -> pacienteId.equals(c.getPaciente().getId()))
+                    .findFirst()
+                    .orElse(null);
+            if (cola != null) {
+                cola.setEstado(estado);
+                colaRepository.save(cola);
+            }
+        }
+    }
+
     public void actualizarEstado(UUID id, String estado) {
-        Cola cola = colaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Entrada de cola no encontrada"));
-        cola.setEstado(estado);
-        colaRepository.save(cola);
+        actualizarEstado(id, null, estado);
     }
 
     private ColaTriajeResponse toResponse(Cola cola) {

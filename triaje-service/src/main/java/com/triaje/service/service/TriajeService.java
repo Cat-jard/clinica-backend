@@ -3,12 +3,13 @@ package com.triaje.service.service;
 import com.triaje.service.dto.*;
 import com.triaje.service.entity.*;
 import com.triaje.service.exception.*;
-import com.triaje.service.feign.cliente.CitaClient;
-import com.triaje.service.feign.cliente.RecepcionClient;
+import com.triaje.service.feign.dto.PacienteColaTriajeResponse;
 import com.triaje.service.mapper.TriajeMapper;
 import com.triaje.service.repository.*;
-import feign.FeignException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,29 +39,42 @@ public class TriajeService {
     private final EntradaKardexRepository kardexRepository;
     private final MedicamentoKardexRepository medicamentoRepository;
     private final TriajeMapper mapper;
-    private final CitaClient citaClient;
-    private final RecepcionClient recepcionClient;
+    private final RabbitTemplate rabbitTemplate;
+    private final ObjectMapper objectMapper;
 
     public List<ColaTriajeResponse> obtenerColaTriaje(LocalDate fecha) {
         try {
-            var response = recepcionClient.obtenerColaTriaje(fecha.format(DateTimeFormatter.ISO_LOCAL_DATE));
-            if (response == null || response.getData() == null) return Collections.emptyList();
-            return response.getData().stream()
+            String fechaStr = fecha.format(DateTimeFormatter.ISO_LOCAL_DATE);
+            String json = (String) rabbitTemplate.convertSendAndReceive(
+                    com.triaje.service.config.RabbitMQConfig.CLINIC_EXCHANGE,
+                    com.triaje.service.config.RabbitMQConfig.COLA_TRIAJE_REQUEST_ROUTING_KEY,
+                    fechaStr
+            );
+            if (json == null || "null".equals(json)) return Collections.emptyList();
+
+            List<PacienteColaTriajeResponse> list = objectMapper.readValue(json, new TypeReference<List<PacienteColaTriajeResponse>>() {});
+            return list.stream()
                     .filter(p -> "EN_ESPERA".equals(p.getEstado()))
                     .map(p -> new ColaTriajeResponse(
                             p.getId(), p.getPacienteId(), p.getPacienteNombre(),
                             p.getPacienteDni(), p.getTicket(), p.getHoraLlegada(),
                             p.getMedicoNombre(), p.getEspecialidad(), p.getMotivo(), p.getCitaId()))
                     .toList();
-        } catch (FeignException e) {
+        } catch (Exception e) {
             throw new RecepcionServiceException("Error al obtener cola de triaje: " + e.getMessage(), e);
         }
     }
 
     public void iniciarTriaje(UUID colaId) {
         try {
-            recepcionClient.actualizarEstadoCola(colaId, "EN_TRIAGE");
-        } catch (FeignException e) {
+            Map<String, Object> command = Map.of("id", colaId.toString(), "estado", "EN_TRIAGE");
+            String json = objectMapper.writeValueAsString(command);
+            rabbitTemplate.convertAndSend(
+                    com.triaje.service.config.RabbitMQConfig.CLINIC_EXCHANGE,
+                    com.triaje.service.config.RabbitMQConfig.COLA_TRIAJE_COMMAND_ROUTING_KEY,
+                    json
+            );
+        } catch (Exception e) {
             throw new RecepcionServiceException("Error al iniciar triaje: " + e.getMessage(), e);
         }
     }
@@ -79,14 +93,21 @@ public class TriajeService {
         boolean conCita = false;
 
         try {
-            var citasResponse = citaClient.listarCitasPorPaciente(pacienteId);
-            if (citasResponse != null && citasResponse.getData() != null && !citasResponse.getData().isEmpty()) {
-                var ultimaCita = citasResponse.getData().getFirst();
-                ultimaCitaId = ultimaCita.getId();
-                medicoId = ultimaCita.getMedicoId();
-                conCita = true;
+            String json = (String) rabbitTemplate.convertSendAndReceive(
+                    com.triaje.service.config.RabbitMQConfig.CLINIC_EXCHANGE,
+                    com.triaje.service.config.RabbitMQConfig.CITAS_PACIENTE_REQUEST_ROUTING_KEY,
+                    pacienteId
+            );
+            if (json != null && !"null".equals(json)) {
+                List<com.triaje.service.feign.dto.CitaResponse> list = objectMapper.readValue(json, new TypeReference<List<com.triaje.service.feign.dto.CitaResponse>>() {});
+                if (!list.isEmpty()) {
+                    var ultimaCita = list.getFirst();
+                    ultimaCitaId = ultimaCita.getId();
+                    medicoId = ultimaCita.getMedicoId();
+                    conCita = true;
+                }
             }
-        } catch (FeignException ignored) {
+        } catch (Exception ignored) {
         }
 
         return new PacienteConCitaDto(pacienteId, pacienteNombre, pacienteDni, nroHistoria,
@@ -114,6 +135,7 @@ public class TriajeService {
         registro.setEspecialidadId(datosPaciente.especialidadId());
         registro.setEspecialidadNombre(datosPaciente.especialidadNombre());
         registro.setCitaId(datosPaciente.ultimaCitaId());
+        if (request.getColaId() != null) registro.setColaId(request.getColaId());
         registro.setTicket(ticket);
         registro.setHoraLlegada(LocalTime.now());
         registro.setFechaTriaje(LocalDate.now());
@@ -143,8 +165,14 @@ public class TriajeService {
         registro.setSignosVitales(signos);
 
         try {
-            recepcionClient.actualizarEstadoCola(request.getColaId(), "CLASIFICADO");
-        } catch (FeignException e) {
+            Map<String, Object> command = Map.of("id", request.getColaId().toString(), "estado", "CLASIFICADO");
+            String json = objectMapper.writeValueAsString(command);
+            rabbitTemplate.convertAndSend(
+                    com.triaje.service.config.RabbitMQConfig.CLINIC_EXCHANGE,
+                    com.triaje.service.config.RabbitMQConfig.COLA_TRIAJE_COMMAND_ROUTING_KEY,
+                    json
+            );
+        } catch (Exception e) {
             throw new RecepcionServiceException("Error al actualizar estado de cola: " + e.getMessage(), e);
         }
 
@@ -163,6 +191,34 @@ public class TriajeService {
         }
 
         return toRegistroResponse(registro, signos);
+    }
+
+    public void marcarAtendido(UUID pacienteId) {
+        var opt = registroTriajeRepository.findTopByPacienteIdOrderByTimestampDesc(pacienteId);
+        if (opt.isPresent()) {
+            var registro = opt.get();
+            registro.setEstado("ATENDIDO");
+            registroTriajeRepository.save(registro);
+
+            try {
+                Map<String, Object> command = new java.util.HashMap<>();
+                command.put("estado", "ATENDIDO");
+                if (registro.getColaId() != null) {
+                    command.put("id", registro.getColaId().toString());
+                } else {
+                    command.put("pacienteId", pacienteId.toString());
+                }
+                String json = objectMapper.writeValueAsString(command);
+                rabbitTemplate.convertAndSend(
+                        com.triaje.service.config.RabbitMQConfig.CLINIC_EXCHANGE,
+                        com.triaje.service.config.RabbitMQConfig.COLA_TRIAJE_COMMAND_ROUTING_KEY,
+                        json
+                );
+            } catch (Exception e) {
+                // Log error but don't throw — the local state is already updated
+                System.err.println("Error sending RabbitMQ ATENDIDO command: " + e.getMessage());
+            }
+        }
     }
 
     public RegistroTriajeResponse obtenerUltimoRegistro(UUID pacienteId) {
@@ -371,15 +427,17 @@ public class TriajeService {
     }
 
     private com.triaje.service.feign.dto.PacienteResponse obtenerPacienteDesdeRecepcion(UUID pacienteId) {
-        try {
-            var response = recepcionClient.obtenerPaciente(pacienteId);
-            if (response == null || response.getData() == null) {
-                throw new ResourceNotFoundException("Paciente no encontrado con id " + pacienteId);
-            }
-            return response.getData();
-        } catch (FeignException.NotFound e) {
+        String json = (String) rabbitTemplate.convertSendAndReceive(
+                com.triaje.service.config.RabbitMQConfig.CLINIC_EXCHANGE,
+                com.triaje.service.config.RabbitMQConfig.PACIENTE_REQUEST_ROUTING_KEY,
+                pacienteId
+        );
+        if (json == null || "null".equals(json)) {
             throw new ResourceNotFoundException("Paciente no encontrado con id " + pacienteId);
-        } catch (FeignException e) {
+        }
+        try {
+            return objectMapper.readValue(json, com.triaje.service.feign.dto.PacienteResponse.class);
+        } catch (Exception e) {
             throw new RecepcionServiceException("Error al obtener paciente: " + e.getMessage(), e);
         }
     }
@@ -417,7 +475,7 @@ public class TriajeService {
                 r.getCitaId(), r.getTicket(), r.getHoraLlegada(), r.getFechaTriaje(),
                 r.getMotivoConsulta(), r.getNivelConciencia(), r.getDolor(), r.getPrioridad(),
                 r.getDestino(), r.getJustificacion(), r.getEnfermeraId(), r.getConCita(),
-                r.getTimestamp(), signosDTO);
+                r.getTimestamp(), r.getEstado(), signosDTO);
     }
 
     private EntradaKardexResponse toKardexResponse(EntradaKardex e) {

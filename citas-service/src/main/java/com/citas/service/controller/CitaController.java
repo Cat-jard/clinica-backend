@@ -75,4 +75,10 @@ public class CitaController {
         Map<String, Long> data = citaService.resumen();
         return ResponseEntity.ok(ApiResponse.ok(data));
     }
+
+    @PostMapping("/paciente/{pacienteId}/atender")
+    public ResponseEntity<ApiResponse<CitaResponse>> atenderCitaHoy(@PathVariable UUID pacienteId) {
+        CitaResponse data = citaService.atenderCitaHoy(pacienteId);
+        return ResponseEntity.ok(ApiResponse.ok(data, "Cita marcada como atendida"));
+    }
 }

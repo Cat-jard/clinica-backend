@@ -50,6 +50,12 @@ public class TriajeController {
                 .body(ApiResponse.ok(data, "Triaje registrado exitosamente"));
     }
 
+    @PostMapping("/registros/{pacienteId}/atender")
+    public ResponseEntity<ApiResponse<Void>> marcarAtendido(@PathVariable UUID pacienteId) {
+        triajeService.marcarAtendido(pacienteId);
+        return ResponseEntity.ok(ApiResponse.ok(null, "Paciente marcado como atendido"));
+    }
+
     @GetMapping("/registros/{pacienteId}/ultimo")
     public ResponseEntity<ApiResponse<RegistroTriajeResponse>> obtenerUltimoRegistro(
             @PathVariable UUID pacienteId) {

@@ -7,25 +7,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="usuario-service" />
-        <module name="config-server" />
-        <module name="auditoria-service" />
         <module name="api-gateway" />
         <module name="soporte-service" />
         <module name="eureka-server" />
-      </profile>
-      <profile name="Annotation profile for inventario-service" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
-        </processorPath>
-        <module name="hospitalizacion-service" />
-        <module name="citas-service" />
-        <module name="inventario-service" />
-        <module name="triaje-service" />
-        <module name="recepcion-service" />
+        <module name="notificacion-service" />
+        <module name="auditoria-service" />
       </profile>
       <profile name="Annotation profile for radiologia-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -37,7 +23,36 @@
         <module name="laboratorio-service" />
         <module name="radiologia-service" />
       </profile>
+      <profile name="Annotation profile for recepcion-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
+        </processorPath>
+        <module name="hospitalizacion-service" />
+        <module name="citas-service" />
+        <module name="inventario-service" />
+        <module name="recepcion-service" />
+        <module name="triaje-service" />
+      </profile>
+      <profile name="Annotation profile for historia-clinica-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
+        </processorPath>
+        <module name="historia-clinica-service" />
+      </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="config-server" target="21" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
@@ -46,9 +61,11 @@
       <module name="citas-service" options="-parameters" />
       <module name="config-server" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
+      <module name="historia-clinica-service" options="-parameters" />
       <module name="hospitalizacion-service" options="-parameters" />
       <module name="inventario-service" options="-parameters" />
       <module name="laboratorio-service" options="-parameters" />
+      <module name="notificacion-service" options="-parameters" />
       <module name="radiologia-service" options="-parameters" />
       <module name="recepcion-service" options="-parameters" />
       <module name="soporte-service" options="-parameters" />

@@ -1,0 +1,172 @@
+version: '3.8'
+
+services:
+  db-usuarios:
+    image: postgres:15-alpine
+    container_name: db-usuarios
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: clinica_usuarios
+    ports:
+      - "5445:5432"
+    volumes:
+      - pgdata_usuarios:/var/lib/postgresql/data
+
+  db-auditoria:
+    image: postgres:15-alpine
+    container_name: db-auditoria
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: clinica_auditoria
+    ports:
+      - "5446:5432"
+    volumes:
+      - pgdata_auditoria:/var/lib/postgresql/data
+
+  db-soporte:
+    image: postgres:15-alpine
+    container_name: db-soporte
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: clinica_soporte
+    ports:
+      - "5447:5432"
+    volumes:
+      - pgdata_soporte:/var/lib/postgresql/data
+
+  db-citas:
+    image: postgres:15-alpine
+    container_name: db-citas
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sihce_citas
+    ports:
+      - "5448:5432"
+    volumes:
+      - pgdata_citas:/var/lib/postgresql/data
+
+  db-hospitalizacion:
+    image: postgres:15-alpine
+    container_name: db-hospitalizacion
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sihce_hospitalizacion
+    ports:
+      - "5449:5432"
+    volumes:
+      - pgdata_hospitalizacion:/var/lib/postgresql/data
+
+  db-inventario:
+    image: postgres:15-alpine
+    container_name: db-inventario
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: clinica_inventario
+    ports:
+      - "5450:5432"
+    volumes:
+      - pgdata_inventario:/var/lib/postgresql/data
+
+  db-laboratorio:
+    image: postgres:15-alpine
+    container_name: db-laboratorio
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sihce_laboratorio
+    ports:
+      - "5451:5432"
+    volumes:
+      - pgdata_laboratorio:/var/lib/postgresql/data
+
+  db-radiologia:
+    image: postgres:15-alpine
+    container_name: db-radiologia
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sihce_radiologia
+    ports:
+      - "5452:5432"
+    volumes:
+      - pgdata_radiologia:/var/lib/postgresql/data
+
+  db-recepcion:
+    image: postgres:15-alpine
+    container_name: db-recepcion
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: recepcion_db
+    ports:
+      - "5453:5432"
+    volumes:
+      - pgdata_recepcion:/var/lib/postgresql/data
+
+  db-triaje:
+    image: postgres:15-alpine
+    container_name: db-triaje
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sihce_triaje
+    ports:
+      - "5454:5432"
+    volumes:
+      - pgdata_triaje:/var/lib/postgresql/data
+
+  db-historia-clinica:
+    image: postgres:15-alpine
+    container_name: db-historia-clinica
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sihce_historia_clinica
+    ports:
+      - "5455:5432"
+    volumes:
+      - pgdata_historia_clinica:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: clinica-rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # Web Dashboard
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  pgdata_usuarios:
+  pgdata_auditoria:
+  pgdata_soporte:
+  pgdata_citas:
+  pgdata_hospitalizacion:
+  pgdata_inventario:
+  pgdata_laboratorio:
+  pgdata_radiologia:
+  pgdata_recepcion:
+  pgdata_triaje:
+  pgdata_historia_clinica:
+  rabbitmq_data:

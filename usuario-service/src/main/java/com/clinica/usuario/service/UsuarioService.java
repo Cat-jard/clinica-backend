@@ -5,11 +5,13 @@ import com.clinica.usuario.domain.Rol;
 import com.clinica.usuario.domain.Usuario;
 import com.clinica.usuario.dto.ActualizarUsuarioRequest;
 import com.clinica.usuario.dto.CrearUsuarioRequest;
+import com.clinica.usuario.dto.MedicoSyncEvent;
 import com.clinica.usuario.dto.RolDto;
 import com.clinica.usuario.dto.UsuarioResponse;
 import com.clinica.usuario.exception.RecursoDuplicadoException;
 import com.clinica.usuario.exception.RecursoNoEncontradoException;
 import com.clinica.usuario.mapper.UsuarioMapper;
+import com.clinica.usuario.messaging.UsuarioEventPublisher;
 import com.clinica.usuario.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,15 +29,18 @@ public class UsuarioService {
     private final UsuarioRepository repositorio;
     private final UsuarioMapper mapper;
     private final PasswordEncoder passwordEncoder;
+    private final UsuarioEventPublisher publisher;
     private final String passwordPorDefecto;
 
     public UsuarioService(UsuarioRepository repositorio,
                           UsuarioMapper mapper,
                           PasswordEncoder passwordEncoder,
+                          UsuarioEventPublisher publisher,
                           @org.springframework.beans.factory.annotation.Value("${app.seed.default-password}") String passwordPorDefecto) {
         this.repositorio = repositorio;
         this.mapper = mapper;
         this.passwordEncoder = passwordEncoder;
+        this.publisher = publisher;
         this.passwordPorDefecto = passwordPorDefecto;
     }
 
@@ -80,7 +85,12 @@ public class UsuarioService {
         String clave = (req.password() == null || req.password().isBlank()) ? passwordPorDefecto : req.password();
         u.setPasswordHash(passwordEncoder.encode(clave));
 
-        return mapper.aResponse(repositorio.save(u));
+        UsuarioResponse res = mapper.aResponse(repositorio.save(u));
+        publisher.publishWelcomeEmail(res.dni(), res.email(), res.nombre(), res.apellidos());
+        if (rol == Rol.MEDICO) {
+            publisher.publishMedicoSync(new MedicoSyncEvent(u.getId(), res.dni(), res.nombre(), res.apellidos(), res.email(), res.telefono(), res.especialidad()));
+        }
+        return res;
     }
 
     public UsuarioResponse actualizar(Long id, ActualizarUsuarioRequest req) {
@@ -108,7 +118,11 @@ public class UsuarioService {
             u.setPasswordHash(passwordEncoder.encode(req.password()));
         }
 
-        return mapper.aResponse(repositorio.save(u));
+        UsuarioResponse res = mapper.aResponse(repositorio.save(u));
+        if (rol == Rol.MEDICO) {
+            publisher.publishMedicoSync(new MedicoSyncEvent(u.getId(), res.dni(), res.nombre(), res.apellidos(), res.email(), res.telefono(), res.especialidad()));
+        }
+        return res;
     }
 
     /**

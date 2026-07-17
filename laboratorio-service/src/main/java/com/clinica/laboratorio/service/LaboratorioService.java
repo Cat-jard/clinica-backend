@@ -1,6 +1,5 @@
 package com.clinica.laboratorio.service;
 
-import com.clinica.laboratorio.client.RadiologiaClient;
 import com.clinica.laboratorio.dto.ExamenSolicitadoDto;
 import com.clinica.laboratorio.dto.IngresarResultadosRequest;
 import com.clinica.laboratorio.dto.ItemExamenRequest;
@@ -10,8 +9,10 @@ import com.clinica.laboratorio.dto.RegistrarMuestraRequest;
 import com.clinica.laboratorio.dto.ResultadoItemRequest;
 import com.clinica.laboratorio.dto.SolicitudExamenesRequest;
 import com.clinica.laboratorio.dto.SolicitudExamenesResponse;
+import com.clinica.laboratorio.dto.RadiologiaSolicitudRequest;
 import com.clinica.laboratorio.entity.ExamenLaboratorio;
 import com.clinica.laboratorio.entity.OrdenLaboratorio;
+import com.clinica.laboratorio.messaging.LaboratorioEventPublisher;
 import com.clinica.laboratorio.repository.OrdenLaboratorioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,11 +30,11 @@ public class LaboratorioService {
     private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm");
 
     private final AtomicInteger secuencia = new AtomicInteger(850);
-    private final RadiologiaClient radiologiaClient;
+    private final LaboratorioEventPublisher eventPublisher;
     private final OrdenLaboratorioRepository ordenRepository;
 
-    public LaboratorioService(RadiologiaClient radiologiaClient, OrdenLaboratorioRepository ordenRepository) {
-        this.radiologiaClient = radiologiaClient;
+    public LaboratorioService(LaboratorioEventPublisher eventPublisher, OrdenLaboratorioRepository ordenRepository) {
+        this.eventPublisher = eventPublisher;
         this.ordenRepository = ordenRepository;
     }
 
@@ -48,8 +49,8 @@ public class LaboratorioService {
                 OrdenLaboratorio orden = crearOrdenLaboratorio(request, paciente, item);
                 lab.add(toDto(ordenRepository.save(orden)));
             } else if (item.esImagen()) {
-                Object estudio = radiologiaClient.crearEstudioDesdeSolicitud(
-                        new RadiologiaClient.RadiologiaSolicitudRequest(
+                eventPublisher.publishRadiologyStudyRequest(
+                        new RadiologiaSolicitudRequest(
                                 request.atencionId(),
                                 paciente,
                                 request.medicoSolicitante(),
@@ -57,7 +58,7 @@ public class LaboratorioService {
                                 item
                         )
                 );
-                radiologia.add(estudio);
+                radiologia.add("Solicitado asincronamente via RabbitMQ");
             }
         }
 

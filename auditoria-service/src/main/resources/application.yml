@@ -6,12 +6,12 @@ spring:
     name: auditoria-service
 
   # ----- Config Server (centralizado). Opcional: el servicio arranca aunque el Config Server este caido -----
-  config:
-    import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}"
+  # config:
+  #   import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}"
 
   # ----- PostgreSQL (BD relacional) -----
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:clinica_auditoria}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5446}/${DB_NAME:clinica_auditoria}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver

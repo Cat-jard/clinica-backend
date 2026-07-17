@@ -1,18 +1,18 @@
 package com.hospitalizacion.service.service;
 
+import com.hospitalizacion.service.config.RabbitMQConfig;
 import com.hospitalizacion.service.dto.*;
 import com.hospitalizacion.service.entity.AutorizacionIngreso;
 import com.hospitalizacion.service.entity.Epicrisis;
 import com.hospitalizacion.service.entity.Hospitalizacion;
 import com.hospitalizacion.service.exception.*;
-import com.hospitalizacion.service.feign.cliente.PacienteClient;
-import com.hospitalizacion.service.feign.dto.PacienteResponse;
 import com.hospitalizacion.service.repository.AutorizacionIngresoRepository;
 import com.hospitalizacion.service.repository.CamaRepository;
 import com.hospitalizacion.service.repository.EpicrisisRepository;
 import com.hospitalizacion.service.repository.HospitalizacionRepository;
-import feign.FeignException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,8 @@ public class HospitalizacionService {
     private final EpicrisisRepository epicrisisRepository;
     private final CamaService camaService;
     private final CamaRepository camaRepository;
-    private final PacienteClient pacienteClient;
+    private final RabbitTemplate rabbitTemplate;
+    private final ObjectMapper objectMapper;
 
     public Page<HospitalizacionResponse> listar(String estado, String servicio, Pageable pageable) {
         return hospitalizacionRepository.buscarConFiltros(estado, servicio, pageable)
@@ -254,16 +255,18 @@ public class HospitalizacionService {
     }
 
     private PacienteResponse obtenerPaciente(UUID pacienteId) {
-        try {
-            var response = pacienteClient.obtenerPaciente(pacienteId);
-            if (response == null || response.getData() == null) {
-                throw new ResourceNotFoundException("Paciente no encontrado con id " + pacienteId);
-            }
-            return response.getData();
-        } catch (FeignException.NotFound e) {
+        String json = (String) rabbitTemplate.convertSendAndReceive(
+                RabbitMQConfig.CLINIC_EXCHANGE,
+                RabbitMQConfig.PACIENTE_REQUEST_ROUTING_KEY,
+                pacienteId
+        );
+        if (json == null || "null".equals(json)) {
             throw new ResourceNotFoundException("Paciente no encontrado con id " + pacienteId);
-        } catch (FeignException e) {
-            throw new PacienteServiceException("Error al obtener paciente: " + e.getMessage(), e);
+        }
+        try {
+            return objectMapper.readValue(json, PacienteResponse.class);
+        } catch (Exception e) {
+            throw new PacienteServiceException("Error al mapear paciente: " + e.getMessage(), e);
         }
     }
 

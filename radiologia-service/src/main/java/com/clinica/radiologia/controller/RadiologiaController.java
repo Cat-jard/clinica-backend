@@ -27,12 +27,6 @@ public class RadiologiaController {
         this.radiologiaService = radiologiaService;
     }
 
-    @PostMapping("/estudios/desde-solicitud")
-    @ResponseStatus(HttpStatus.CREATED)
-    public EstudioImagenDto crearDesdeSolicitud(@Valid @RequestBody RadiologiaSolicitudRequest request) {
-        return radiologiaService.crearDesdeSolicitud(request);
-    }
-
     @GetMapping("/estudios")
     public List<EstudioImagenDto> listar() {
         return radiologiaService.listar();

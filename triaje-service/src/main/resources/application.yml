@@ -1,11 +1,11 @@
 server:
-  port: 8003
+  port: 8113
 
 spring:
   application:
     name: triaje-service
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:sihce_triaje}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5454}/${DB_NAME:sihce_triaje}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
@@ -26,15 +26,12 @@ spring:
   cloud:
     compatibility-verifier:
       enabled: false
-    openfeign:
-      client:
-        config:
-          citas-service:
-            connect-timeout: 5000
-            read-timeout: 5000
-          recepcion-service:
-            connect-timeout: 5000
-            read-timeout: 5000
+  # ----- RabbitMQ (Mensajeria asincrona) -----
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASS:guest}
 
 springdoc:
   api-docs:
@@ -46,14 +43,6 @@ logging:
   level:
     com.triaje: DEBUG
     org.springframework.cloud.openfeign: DEBUG
-
-citas:
-  api:
-    url: http://localhost:8002
-
-recepcion:
-  api:
-    url: http://localhost:8001
 
 eureka:
   client:

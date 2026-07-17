@@ -4,26 +4,28 @@ server:
 spring:
   application:
     name: laboratorio-service
-  config:
-    import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}"
   cloud:
     compatibility-verifier:
       enabled: false
-    openfeign:
-      client:
-        config:
-          radiologia-service:
-            connect-timeout: 5000
-            read-timeout: 5000
+
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:sihce_laboratorio}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5451}/${DB_NAME:sihce_laboratorio}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
+
+  # ----- RabbitMQ (Mensajeria asincrona) -----
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASS:guest}
+
   flyway:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
+
   jpa:
     hibernate:
       # Flyway gestiona el esquema; Hibernate solo valida.
@@ -43,10 +45,6 @@ eureka:
     fetch-registry: true
   instance:
     prefer-ip-address: true
-
-radiologia:
-  api:
-    url: ${RADIOLOGIA_API_URL:http://localhost:8085}
 
 management:
   endpoints:

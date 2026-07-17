@@ -1,11 +1,11 @@
 server:
-  port: 8004
+  port: 8114
 
 spring:
   application:
     name: hospitalizacion-service
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:sihce_hospitalizacion}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5449}/${DB_NAME:sihce_hospitalizacion}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
@@ -26,12 +26,12 @@ spring:
   cloud:
     compatibility-verifier:
       enabled: false
-    openfeign:
-      client:
-        config:
-          recepcion-service:
-            connect-timeout: 5000
-            read-timeout: 5000
+  # ----- RabbitMQ (Mensajeria asincrona) -----
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASS:guest}
 
 springdoc:
   api-docs:
@@ -43,10 +43,6 @@ logging:
   level:
     com.hospitalizacion: DEBUG
     org.springframework.cloud.openfeign: DEBUG
-
-recepcion:
-  api:
-    url: http://localhost:8001
 
 eureka:
   client:

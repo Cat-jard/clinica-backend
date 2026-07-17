@@ -6,14 +6,15 @@ import com.citas.service.entity.Cita;
 import com.citas.service.exception.BadRequestException;
 import com.citas.service.exception.ConflictException;
 import com.citas.service.exception.ResourceNotFoundException;
-import com.citas.service.feign.RecepcionClient;
-import com.citas.service.feign.UsuarioClient;
 import com.citas.service.mapper.CitaMapper;
+import com.citas.service.messaging.CitasEventPublisher;
 import com.citas.service.repository.CancelacionCitaRepository;
 import com.citas.service.repository.CitaRepository;
-import feign.FeignException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,11 +34,13 @@ public class CitaService {
     private final CitaRepository citaRepository;
     private final CancelacionCitaRepository cancelacionRepository;
     private final CitaMapper citaMapper;
-    private final RecepcionClient recepcionClient;
-    private final UsuarioClient usuarioClient;
+    private final RabbitTemplate rabbitTemplate;
+    private final ObjectMapper objectMapper;
+    private final CitasEventPublisher eventPublisher;
 
     public CitaResponse create(CitaRequest request) {
-        String medicoNombre = validarMedico(request.getMedicoId());
+        var medico = obtenerMedico(request.getMedicoId());
+        String medicoNombre = medico.nombre() + " " + medico.apellidos();
 
         if (request.getHoraInicio().isAfter(request.getHoraFin()) ||
             request.getHoraInicio().equals(request.getHoraFin())) {
@@ -62,6 +65,18 @@ public class CitaService {
         cita.setPacienteNombre(pacienteNombre.trim());
         cita.setMedicoNombre(medicoNombre);
         cita = citaRepository.save(cita);
+
+        // Publicar evento de cita creada
+        eventPublisher.publishAppointmentCreated(
+                paciente.email(),
+                cita.getPacienteNombre(),
+                cita.getMedicoId().toString(),
+                cita.getMedicoNombre(),
+                medico.especialidad(),
+                cita.getFechaCita().toString(),
+                cita.getHoraInicio().toString()
+        );
+
         return citaMapper.toResponse(cita);
     }
 
@@ -88,8 +103,19 @@ public class CitaService {
 
     @Transactional(readOnly = true)
     public Page<CitaResponse> findAll(String estado, LocalDate desde, LocalDate hasta, Pageable pageable) {
-        if (estado != null || desde != null || hasta != null) {
-            return citaRepository.findAll(pageable).map(citaMapper::toResponse);
+        if (desde != null && hasta != null) {
+            List<Cita> citas = citaRepository.findPorRangoFechas(desde, hasta);
+            if (estado != null) {
+                citas = citas.stream().filter(c -> c.getEstado().equals(estado)).toList();
+            }
+            int start = (int) pageable.getOffset();
+            int end = Math.min(start + pageable.getPageSize(), citas.size());
+            if (start >= citas.size()) {
+                return Page.empty();
+            }
+            List<CitaResponse> content = citas.subList(start, end).stream()
+                    .map(citaMapper::toResponse).toList();
+            return new PageImpl<>(content, pageable, citas.size());
         }
         return citaRepository.findAll(pageable).map(citaMapper::toResponse);
     }
@@ -102,6 +128,9 @@ public class CitaService {
             throw new ConflictException("La cita ya se encuentra cancelada");
         }
 
+        PacienteResponse paciente = obtenerPaciente(cita.getPacienteId());
+        var medico = obtenerMedico(cita.getMedicoId());
+
         cita.setEstado("CANCELADA");
         citaRepository.save(cita);
 
@@ -111,6 +140,17 @@ public class CitaService {
         cancelacion.setCanceladoPor(request.getCanceladoPor());
         cancelacion.setFechaCancelacion(LocalDateTime.now());
         cancelacion = cancelacionRepository.save(cancelacion);
+
+        // Publicar evento de cita cancelada
+        eventPublisher.publishAppointmentCancelled(
+                paciente.email(),
+                cita.getPacienteNombre(),
+                cita.getMedicoId().toString(),
+                cita.getMedicoNombre(),
+                medico.especialidad(),
+                cita.getFechaCita().toString(),
+                cita.getHoraInicio().toString()
+        );
 
         return new CancelacionResponse(
                 cancelacion.getId(),
@@ -131,24 +171,52 @@ public class CitaService {
         );
     }
 
-    private String validarMedico(Long medicoId) {
-        try {
-            var medico = usuarioClient.obtenerMedico(medicoId);
-            return medico.nombre() + " " + medico.apellidos();
-        } catch (FeignException.NotFound e) {
-            throw new ResourceNotFoundException("Medico no encontrado con id " + medicoId);
+    public CitaResponse atenderCitaHoy(UUID pacienteId) {
+        LocalDate hoy = LocalDate.now();
+        List<Cita> citas = citaRepository.findByPacienteIdOrderByFechaCitaDesc(pacienteId);
+        Cita citaHoy = citas.stream()
+                .filter(c -> hoy.equals(c.getFechaCita()) && "PROGRAMADA".equals(c.getEstado()))
+                .findFirst()
+                .orElse(null);
+
+        if (citaHoy == null) {
+            return null;
         }
+
+        citaHoy.setEstado("ATENDIDA");
+        citaHoy = citaRepository.save(citaHoy);
+        return citaMapper.toResponse(citaHoy);
     }
 
     private PacienteResponse obtenerPaciente(UUID pacienteId) {
-        try {
-            var response = recepcionClient.obtenerPaciente(pacienteId);
-            if (response.data() == null) {
-                throw new ResourceNotFoundException("Paciente no encontrado con id " + pacienteId);
-            }
-            return response.data();
-        } catch (FeignException.NotFound e) {
+        String json = (String) rabbitTemplate.convertSendAndReceive(
+                com.citas.service.config.RabbitMQConfig.CLINIC_EXCHANGE,
+                com.citas.service.config.RabbitMQConfig.PACIENTE_REQUEST_ROUTING_KEY,
+                pacienteId
+        );
+        if (json == null || "null".equals(json)) {
             throw new ResourceNotFoundException("Paciente no encontrado con id " + pacienteId);
+        }
+        try {
+            return objectMapper.readValue(json, PacienteResponse.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al mapear paciente", e);
+        }
+    }
+
+    private MedicoResponse obtenerMedico(Long medicoId) {
+        String json = (String) rabbitTemplate.convertSendAndReceive(
+                com.citas.service.config.RabbitMQConfig.CLINIC_EXCHANGE,
+                com.citas.service.config.RabbitMQConfig.MEDICO_REQUEST_ROUTING_KEY,
+                medicoId
+        );
+        if (json == null || "null".equals(json)) {
+            throw new ResourceNotFoundException("Medico no encontrado con id " + medicoId);
+        }
+        try {
+            return objectMapper.readValue(json, MedicoResponse.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al mapear medico", e);
         }
     }
 

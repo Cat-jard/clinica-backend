@@ -4,12 +4,14 @@ server:
 spring:
   application:
     name: api-gateway
-
-  # ----- Config Server (opcional: el gateway arranca aunque el Config Server este caido) -----
-  config:
-    import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}"
-
   cloud:
+    config:
+      enabled: false
+
+    # ----- Config Server (opcional: el gateway arranca aunque el Config Server este caido) -----
+    # config:
+    #   import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}"
+
     gateway:
       # Descubre servicios en Eureka, pero SOLO enrutamos con las rutas explicitas de abajo.
       discovery:
@@ -102,6 +104,12 @@ spring:
           uri: lb://radiologia-service
           predicates:
             - Path=/api/radiologia/**
+
+        # historia-clinica-service (atenciones medicas, HCE)
+        - id: historia-clinica
+          uri: lb://historia-clinica-service
+          predicates:
+            - Path=/api/atenciones/**
 
         # inventario-service (productos, movimientos de stock)
         - id: inventario-productos

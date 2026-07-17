@@ -27,5 +27,6 @@ public record RegistroTriajeResponse(
     String enfermeraId,
     Boolean conCita,
     LocalDateTime timestamp,
+    String estado,
     SignosVitalesDTO signos
 ) {}

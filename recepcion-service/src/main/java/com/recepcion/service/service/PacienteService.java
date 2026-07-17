@@ -6,7 +6,9 @@ import com.recepcion.service.dto.PacienteResponse;
 import com.recepcion.service.entity.Paciente;
 import com.recepcion.service.exception.DuplicatedDocumentException;
 import com.recepcion.service.exception.ResourceNotFoundException;
+import com.recepcion.service.dto.PacienteSyncEvent;
 import com.recepcion.service.mapper.PacienteMapper;
+import com.recepcion.service.messaging.RecepcionEventPublisher;
 import com.recepcion.service.repository.ConsentimientoInformadoRepository;
 import com.recepcion.service.repository.PacienteRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ public class PacienteService {
     private final PacienteRepository pacienteRepository;
     private final ConsentimientoInformadoRepository consentimientoRepository;
     private final PacienteMapper pacienteMapper;
+    private final RecepcionEventPublisher eventPublisher;
 
     public PacienteResponse create(CreatePacienteRequest request) {
         if (pacienteRepository.existsByNroDocumento(request.getNroDocumento())) {
@@ -35,7 +38,13 @@ public class PacienteService {
         paciente.setNroHistoria(generarNroHistoria());
         paciente = pacienteRepository.save(paciente);
         paciente.setConsentimiento("Pendiente");
-        return pacienteMapper.toResponse(paciente);
+        PacienteResponse res = pacienteMapper.toResponse(paciente);
+        eventPublisher.publishPacienteSync(new PacienteSyncEvent(
+                res.id(), res.tipoDocumento(), res.nroDocumento(), res.nombres(),
+                res.apellidoPaterno(), res.apellidoMaterno(), res.fechaNacimiento(),
+                res.sexo(), res.telefono(), res.email(), res.direccion(), res.nroHistoria()
+        ));
+        return res;
     }
 
     @Transactional(readOnly = true)
@@ -67,7 +76,13 @@ public class PacienteService {
         pacienteMapper.updateEntity(request, paciente);
         paciente = pacienteRepository.save(paciente);
         setConsentimientoVirtual(paciente);
-        return pacienteMapper.toResponse(paciente);
+        PacienteResponse res = pacienteMapper.toResponse(paciente);
+        eventPublisher.publishPacienteSync(new PacienteSyncEvent(
+                res.id(), res.tipoDocumento(), res.nroDocumento(), res.nombres(),
+                res.apellidoPaterno(), res.apellidoMaterno(), res.fechaNacimiento(),
+                res.sexo(), res.telefono(), res.email(), res.direccion(), res.nroHistoria()
+        ));
+        return res;
     }
 
     private String generarNroHistoria() {

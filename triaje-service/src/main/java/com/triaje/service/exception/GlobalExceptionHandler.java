@@ -1,7 +1,6 @@
 package com.triaje.service.exception;
 
 import com.triaje.service.dto.ApiResponse;
-import feign.FeignException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -61,20 +60,11 @@ public class GlobalExceptionHandler {
                 .body(new ApiResponse<>(errors, "Error de validacion", java.time.Instant.now().toString()));
     }
 
-    @ExceptionHandler(FeignException.class)
-    public ResponseEntity<ApiResponse<Void>> handleFeign(FeignException ex) {
-        String message = "Error al comunicarse con otro servicio";
-        if (ex.status() == 404) {
-            message = "Recurso no encontrado en servicio externo";
-        } else if (ex.status() == 502 || ex.status() == 503) {
-            message = "Servicio externo no disponible";
-        }
-        return ResponseEntity.status(ex.status() != 0 ? ex.status() : 502)
-                .body(ApiResponse.error(message));
-    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGeneral(Exception ex) {
+        ex.printStackTrace(); // Log stack trace for debugging
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error("Error interno del servidor"));
     }

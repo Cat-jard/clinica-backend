@@ -10,6 +10,7 @@ import com.clinica.soporte.dto.CrearTicketRequest;
 import com.clinica.soporte.dto.TicketResponse;
 import com.clinica.soporte.exception.RecursoNoEncontradoException;
 import com.clinica.soporte.mapper.TicketMapper;
+import com.clinica.soporte.messaging.SoporteEventPublisher;
 import com.clinica.soporte.repository.TicketRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,10 +26,12 @@ public class SoporteService {
 
     private final TicketRepository repositorio;
     private final TicketMapper mapper;
+    private final SoporteEventPublisher eventPublisher;
 
-    public SoporteService(TicketRepository repositorio, TicketMapper mapper) {
+    public SoporteService(TicketRepository repositorio, TicketMapper mapper, SoporteEventPublisher eventPublisher) {
         this.repositorio = repositorio;
         this.mapper = mapper;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional(readOnly = true)
@@ -82,7 +85,9 @@ public class SoporteService {
         if (req.asignadoA() != null) {
             t.setAsignadoA(req.asignadoA().isBlank() ? null : req.asignadoA().trim());
         }
-        return mapper.aResponse(repositorio.save(t));
+        TicketResponse res = mapper.aResponse(repositorio.save(t));
+        eventPublisher.publishTicketAssigned(t.getAsignadoA(), t.getCodigo(), t.getTitulo(), t.getPrioridad().name());
+        return res;
     }
 
     public TicketResponse cambiarEstado(Long id, CambiarEstadoRequest req) {
@@ -91,7 +96,9 @@ public class SoporteService {
         if (req.asignadoA() != null && !req.asignadoA().isBlank()) {
             t.setAsignadoA(req.asignadoA().trim());
         }
-        return mapper.aResponse(repositorio.save(t));
+        TicketResponse res = mapper.aResponse(repositorio.save(t));
+        eventPublisher.publishTicketAssigned(t.getAsignadoA(), t.getCodigo(), t.getTitulo(), t.getPrioridad().name());
+        return res;
     }
 
     private Ticket buscarEntidad(Long id) {

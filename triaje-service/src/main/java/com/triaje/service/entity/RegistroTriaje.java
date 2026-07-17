@@ -50,6 +50,9 @@ public class RegistroTriaje {
     @Column(name = "cita_id")
     private UUID citaId;
 
+    @Column(name = "cola_id")
+    private UUID colaId;
+
     @Column(nullable = false, length = 20)
     private String ticket;
 
@@ -85,6 +88,9 @@ public class RegistroTriaje {
 
     @Column(name = "con_cita", nullable = false)
     private Boolean conCita;
+
+    @Column(nullable = false, length = 20)
+    private String estado = "CLASIFICADO";
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
